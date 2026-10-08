@@ -55,7 +55,7 @@ Inspect the run log to confirm the optimizer step completed. If all rollouts hav
 ## Documentation
 
 - [Setup and data preparation](docs/setup.md)
-- [ELT-Bench upstream repository](repo/README.md)
+- [ELT-Bench upstream repository](https://github.com/uiuc-kang-lab/ELT-Bench)
 
 ## Repository layout
 

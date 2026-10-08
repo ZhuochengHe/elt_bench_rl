@@ -34,7 +34,7 @@ Complete this one-time checklist before a Snowflake rollout:
 - [ ] Install Airbyte **1.5.0**. The benchmark Terraform provider is pinned to **0.6.5** in the upstream configuration.
 - [ ] Register the declarative connector image version in Airbyte's database using the command below. The `elt_snowflake.yaml` manifest uses version `6.33.4`, which requires the corresponding major-version `6` row.
 - [ ] Follow the upstream [Airbyte setup instructions](https://github.com/uiuc-kang-lab/ELT-Bench#setup-airbyte): import `repo/setup/elt_snowflake.yaml`, publish it (confirm the warning prompt), and record the Workspace ID and API Definition ID.
-- [ ] Follow the upstream [Snowflake destination setup](https://github.com/uiuc-kang-lab/ELT-Bench#snowflake): replace the sample role, user, warehouse, schema, and password values in `repo/setup/destination/setup.sql`, run it in a Snowflake worksheet, and grant `CREATE DATABASE ON ACCOUNT` to the created role.
+- [ ] Follow the upstream [Snowflake destination setup](https://github.com/uiuc-kang-lab/ELT-Bench#snowflake): replace the sample role, user, warehouse, schema, and password values in `repo/setup/destination/setup.sql`, then run it in a Snowflake worksheet. As `ACCOUNTADMIN`, grant `CREATE DATABASE ON ACCOUNT` to the created role (for the default role: `GRANT CREATE DATABASE ON ACCOUNT TO ROLE AIRBYTE_ROLE;`).
 - [ ] Fill in `repo/setup/airbyte/airbyte_credential.json` with Airbyte credentials and the two IDs. Copy `repo/setup/destination/snowflake_credential.json` to `.secrets/destination/snowflake_credential.json` and fill in the matching account, user, password, role, and warehouse values.
 
 Install the pinned Airbyte version:
