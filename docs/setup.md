@@ -101,7 +101,7 @@ The harness supports the official ELT-Bench destinations that have upstream conn
 abctl local install --chart-version 1.5.0
 ```
 
-Keep the Terraform provider at the upstream-pinned version 0.6.5; Airbyte 2.3.0 returns an empty `dataResidency` value that this provider cannot deserialize. Continue with the remaining Airbyte and warehouse setup instructions in [`repo/README.md`](../repo/README.md). Download and seed only the data required for the chosen task when possible. If Airbyte runs in its own local Kubernetes network, connect its control-plane container to the ELT-Bench network created by the helper:
+Keep the Terraform provider at the upstream-pinned version 0.6.5. Continue with the remaining Airbyte and warehouse setup instructions in [`repo/README.md`](../repo/README.md). Download and seed only the data required for the chosen task when possible. If Airbyte runs in its own local Kubernetes network, connect its control-plane container to the ELT-Bench network created by the helper:
 
 ```bash
 docker network connect elt-docker_elt_network airbyte-abctl-control-plane
@@ -127,7 +127,7 @@ python -m eltbench.train \
   --destination snowflake \
   --model_name Qwen/Qwen3-8B \
   --check_loading \
-  --batch_size 1 --group_size 1 --max_turns 40
+  --batch_size 1 --group_size 4 --max_turns 40
 ```
 
 Start with a small batch and group size: each concurrent rollout starts a Docker container and uses an isolated warehouse namespace. Credentialed runs can create billable cloud resources. Review the generated Terraform plan and clean up resources after testing.
