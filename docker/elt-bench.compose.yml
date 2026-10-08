@@ -1,0 +1,25 @@
+services:
+  localstack:
+    image: localstack/localstack:3.7.2
+    restart: unless-stopped
+    environment:
+      SERVICES: s3
+      DEBUG: "0"
+      LAMBDA_EXECUTOR: docker
+
+  postgres:
+    restart: unless-stopped
+
+  mongodb:
+    restart: unless-stopped
+    command:
+      - --replSet
+      - rs0
+      - --bind_ip_all
+      - --port
+      - "27017"
+      - --wiredTigerCacheSizeGB
+      - "0.25"
+
+  python-rest-api:
+    restart: unless-stopped

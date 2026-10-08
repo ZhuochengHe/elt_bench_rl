@@ -25,6 +25,8 @@ pytest -q
 
 For local integration tests and training, prepare the local services and benchmark data described in [Setup](docs/setup.md). Set `TINKER_API_KEY` in your shell to run training; do not put credentials in source control.
 
+The setup guide includes scripts to fetch upstream source archives, start local services with the required Compose compatibility settings, and seed source fixtures. This keeps downloaded data and local service configuration out of the ELT-Bench submodule history.
+
 ```bash
 python tests/manual/rollout_local.py all
 python -m eltbench.train --destination local_postgres \

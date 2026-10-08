@@ -7,6 +7,7 @@ This guide covers dependency installation, local validation, benchmark data prep
 - Linux, macOS, or WSL2
 - [uv](https://docs.astral.sh/uv/)
 - Docker Engine with Compose
+- `unzip`, AWS CLI, and `psql` for local source setup
 - Git and Git LFS-compatible network access for the benchmark's external assets
 - A Tinker API key for model sampling and optimization
 
@@ -42,21 +43,31 @@ Run the unit and isolated integration suite:
 pytest -q
 ```
 
-The local end-to-end rollout also requires the benchmark's local services, source fixtures, and the agent image. Follow the Docker and data setup instructions in [`repo/README.md`](../repo/README.md), including the upstream `setup/elt_setup.sh` workflow where applicable. This downloads and materializes benchmark assets; it is intentionally not part of a normal clone.
+The local end-to-end rollout also requires ELT-Bench source data, local services, and the agent image. Download and extract the upstream source-data archives with the project helper. The archives are cached under `runs/benchmark-assets/upstream`; extracted data stays in the submodule's expected local data directories and is not committed:
+
+```bash
+bash scripts/fetch_local_assets.sh
+```
+
+Start the services using the upstream Compose file plus the repository-maintained local overlay:
+
+```bash
+bash scripts/start_local_services.sh
+```
+
+The overlay pins LocalStack to a compatible release and applies local container defaults without modifying the submodule. Seed the PostgreSQL and S3 fixtures required by a task:
+
+```bash
+bash scripts/seed_resumable.sh address
+```
+
+The helper accepts task names as positional arguments. Without arguments it checks all available source definitions. It sets the S3-compatible storage checksum option required by the local seed scripts. For MongoDB-backed sources, use `python scripts/mongo_seed_resumable.py --path repo/setup`. These helpers require Docker, the AWS CLI, and `psql`.
 
 Build the agent image from the project root:
 
 ```bash
 docker build -f docker/Dockerfile.elt-swe -t elt-swe:local .
 ```
-
-Start the benchmark services using the upstream instructions. Then seed any required local sources using the upstream setup scripts or the resumable helper:
-
-```bash
-bash scripts/seed_resumable.sh address
-```
-
-The helper accepts task names as positional arguments. Without arguments it checks all available source definitions. Set `SETUP_DIR` if the upstream checkout is not at `./repo/setup`. The MongoDB helper is available as `python scripts/mongo_seed_resumable.py --path repo/setup`.
 
 Run the full local dbt-to-grader integration probe:
 
@@ -82,7 +93,11 @@ Do not put API keys or warehouse credentials in `.env` files that might be commi
 
 ## Credentialed warehouse rollouts
 
-The harness supports the official ELT-Bench destinations that have upstream connector support. Set up Airbyte and the selected warehouse using the upstream instructions in [`repo/README.md`](../repo/README.md). Download and seed only the data required for the chosen task when possible.
+The harness supports the official ELT-Bench destinations that have upstream connector support. Set up Airbyte and the selected warehouse using the upstream instructions in [`repo/README.md`](../repo/README.md). Download and seed only the data required for the chosen task when possible. If Airbyte runs in its own local Kubernetes network, connect its control-plane container to the ELT-Bench network created by the helper:
+
+```bash
+docker network connect elt-docker_elt_network airbyte-abctl-control-plane
+```
 
 Keep warehouse credentials outside the submodule so its tracked templates remain untouched. For Snowflake, copy the template into the local secrets directory and fill in the required values in the copied file:
 

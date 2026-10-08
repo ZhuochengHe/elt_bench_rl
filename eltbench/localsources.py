@@ -9,10 +9,9 @@ import urllib.request
 from pathlib import Path
 from typing import Any, Iterable
 
-CACHE_DIR = Path("runs/_src_cache")
-
-
-RAW_SEED_DIR = Path("repo/setup/data")
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
+CACHE_DIR = PROJECT_ROOT / "runs" / "_src_cache"
+RAW_SEED_DIR = PROJECT_ROOT / "repo" / "setup" / "data"
 
 
 LOCALSTACK_URL = "http://localhost:4566"

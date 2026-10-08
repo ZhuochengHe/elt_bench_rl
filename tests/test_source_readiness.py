@@ -78,3 +78,11 @@ def test_non_postgres_source_fetch_failure_is_not_silently_skipped(monkeypatch):
             task="task",
             harness={"host": "localhost", "port": 5432, "user": "u", "password": "p"},
         )
+
+
+def test_source_paths_are_anchored_to_repository_root(tmp_path, monkeypatch):
+    monkeypatch.chdir(tmp_path)
+
+    assert localsources.PROJECT_ROOT == ROOT
+    assert localsources.CACHE_DIR == ROOT / "runs" / "_src_cache"
+    assert localsources.RAW_SEED_DIR == ROOT / "repo" / "setup" / "data"
