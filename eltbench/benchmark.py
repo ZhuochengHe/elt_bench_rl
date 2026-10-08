@@ -47,7 +47,7 @@ from common import warehouse as _warehouse  # noqa: E402
 
 TABLE_MANIFEST_PATH = _EVAL_DIR / "table.json"
 SORT_KEY_PATH = _EVAL_DIR / "sort_key.json"
-GT_ROOT = Path(os.environ.get("ELT_BENCH_GT_DIR", _EVAL_DIR / "gt"))
+GT_ROOT = ROOT / "runs" / "benchmark-assets" / "evaluation" / "gt"
 BENCHMARK_ROOT = REPO / "elt-bench"
 DOCUMENTATION_DIR = REPO / "documentation"
 CREDENTIAL_DIR = _SETUP_DIR / "destination"

@@ -188,16 +188,14 @@ def test_load_mode_is_content_only_where_a_separate_source_exists():
 def test_official_backends_reuse_credential_file(destination):
     path = benchmark.credential_path_for(destination)
     assert path.name == f"{destination}_credential.json"
-    cfg = benchmark.connector_config(destination)
     if path.is_file():
+        cfg = benchmark.connector_config(destination)
         assert cfg == json.loads(path.read_text(encoding="utf-8"))
 
 
 def test_credential_directory_can_live_outside_the_submodule(monkeypatch, tmp_path):
     monkeypatch.setenv("ELT_BENCH_CREDENTIAL_DIR", str(tmp_path))
-    assert benchmark.credential_path_for("snowflake") == (
-        tmp_path / "snowflake_credential.json"
-    )
+    assert benchmark.credential_path_for("snowflake") == tmp_path / "snowflake_credential.json"
 
 
 def test_staged_inputs_use_external_credential_directory(monkeypatch, tmp_path):
@@ -215,4 +213,9 @@ def test_staged_inputs_use_external_credential_directory(monkeypatch, tmp_path):
     monkeypatch.setattr(benchmark, "generate_inputs", generate)
     stage_inputs("snowflake", tmp_path / "staged")
 
-    assert calls == [("snowflake", credential_dir / "snowflake_credential.json")]
+    assert calls == [
+        (
+            "snowflake",
+            credential_dir / "snowflake_credential.json",
+        )
+    ]

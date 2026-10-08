@@ -9,19 +9,17 @@ The harness uses [Tinker Cookbook](https://github.com/thinking-machines-lab/tink
 Clone the repository with its benchmark dependency:
 
 ```bash
-git clone --recurse-submodules <repository-url>
-cd eltbench-tinker
-python -m venv .venv
+git clone --recurse-submodules https://github.com/ZhuochengHe/elt_bench_rl.git
+cd elt_bench_rl
+uv venv --python 3.11 .venv
 source .venv/bin/activate
-python -m pip install -r requirements.txt
+uv pip install -r requirements.txt
 ```
 
-Download the benchmark ground truth, then run the credential-free tests:
+Download the benchmark ground truth, then run the credential-free tests. Ground truth is stored at `runs/benchmark-assets/evaluation/gt` and discovered automatically:
 
 ```bash
-python -m pip install gdown
 bash scripts/fetch_ground_truth.sh
-export ELT_BENCH_GT_DIR="$PWD/runs/benchmark-assets/evaluation/gt"
 pytest -q
 ```
 

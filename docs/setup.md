@@ -5,7 +5,7 @@ This guide covers dependency installation, local validation, benchmark data prep
 ## Prerequisites
 
 - Linux, macOS, or WSL2
-- Python 3.11
+- [uv](https://docs.astral.sh/uv/)
 - Docker Engine with Compose
 - Git and Git LFS-compatible network access for the benchmark's external assets
 - A Tinker API key for model sampling and optimization
@@ -13,12 +13,11 @@ This guide covers dependency installation, local validation, benchmark data prep
 Clone the repository including the pinned ELT-Bench submodule, then install Python dependencies:
 
 ```bash
-git clone --recurse-submodules <repository-url>
-cd eltbench-tinker
-python3.11 -m venv .venv
+git clone --recurse-submodules https://github.com/ZhuochengHe/elt_bench_rl.git
+cd elt_bench_rl
+uv venv --python 3.11 .venv
 source .venv/bin/activate
-python -m pip install --upgrade pip
-python -m pip install -r requirements.txt
+uv pip install -r requirements.txt
 ```
 
 If the repository was cloned without submodules, initialize the pinned dependency with:
@@ -29,15 +28,13 @@ git submodule update --init --recursive
 
 ## Credential-free checks
 
-The benchmark's ground-truth CSVs are distributed separately from the ELT-Bench Git repository. Download them into the ignored `runs/` directory before running tests or training:
+The benchmark's ground-truth CSVs are distributed separately from the ELT-Bench Git repository. Download them into the fixed `runs/benchmark-assets/evaluation/gt` location before running tests or training; the application discovers this path automatically:
 
 ```bash
-python -m pip install gdown
 bash scripts/fetch_ground_truth.sh
-export ELT_BENCH_GT_DIR="$PWD/runs/benchmark-assets/evaluation/gt"
 ```
 
-The script uses the upstream ELT-Bench ground-truth archive. To use a different location, set `ELT_BENCH_ASSET_DIR` before running it and set `ELT_BENCH_GT_DIR` to the extracted `evaluation/gt` directory.
+The script downloads the upstream ELT-Bench ground-truth archive. `gdown` is installed with the project dependencies.
 
 Run the unit and isolated integration suite:
 
@@ -87,13 +84,12 @@ Do not put API keys or warehouse credentials in `.env` files that might be commi
 
 The harness supports the official ELT-Bench destinations that have upstream connector support. Set up Airbyte and the selected warehouse using the upstream instructions in [`repo/README.md`](../repo/README.md). Download and seed only the data required for the chosen task when possible.
 
-Keep warehouse credentials outside the submodule so its tracked templates remain untouched. For Snowflake, copy the template into a local secrets directory and edit that copy:
+Keep warehouse credentials outside the submodule so its tracked templates remain untouched. For Snowflake, copy the template into the local secrets directory and fill in the required values in the copied file:
 
 ```bash
 mkdir -p .secrets/destination
 cp repo/setup/destination/snowflake_credential.json \
   .secrets/destination/snowflake_credential.json
-${EDITOR:-vi} .secrets/destination/snowflake_credential.json
 export ELT_BENCH_CREDENTIAL_DIR="$PWD/.secrets/destination"
 ```
 
@@ -115,6 +111,6 @@ Start with a small batch and group size: each concurrent rollout starts a Docker
 
 ## Configuration
 
-Local PostgreSQL connection settings can be overridden with `ELT_PG_HOST`, `ELT_PG_PORT`, `ELT_PG_USER`, `ELT_PG_PASSWORD`, `ELT_PG_CONTAINER_HOST`, and `ELT_PG_CONTAINER_PORT`. The default values target the upstream local Compose setup. `ELT_BENCH_CREDENTIAL_DIR` points to local warehouse credentials, and `ELT_BENCH_GT_DIR` points to the downloaded ground truth. The `TINKER_API_KEY` is required only for Tinker model calls.
+Local PostgreSQL connection settings can be overridden with `ELT_PG_HOST`, `ELT_PG_PORT`, `ELT_PG_USER`, `ELT_PG_PASSWORD`, `ELT_PG_CONTAINER_HOST`, and `ELT_PG_CONTAINER_PORT`. The default values target the upstream local Compose setup. Ground truth is read from `runs/benchmark-assets/evaluation/gt`. `ELT_BENCH_CREDENTIAL_DIR` optionally points to local warehouse credentials. The `TINKER_API_KEY` is required only for Tinker model calls.
 
 Use `python -m eltbench.train --help` to inspect training options. Keep run output, generated task workspaces, downloaded assets, and credentials outside source control.
