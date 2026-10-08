@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import asyncio
 import os
-import random
 from datetime import datetime
 from pathlib import Path
 from typing import Sequence
@@ -23,6 +22,7 @@ from .env import (
     renderer_for,
     rollout_termination,
 )
+from .task_selection import select_trainable_tasks
 from .workspace import new_run_tag
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -108,6 +108,7 @@ class ELTDatasetBuilder(RLDatasetBuilder):
     max_models: int = 1
     max_tasks: int = 0
     test_frac: float = 0.0
+    task_name: str | None = None
 
     eval_batch_size: int = 0
     seed: int = 0
@@ -128,13 +129,14 @@ class ELTDatasetBuilder(RLDatasetBuilder):
         renderer = renderer_for(
             self.model_name_for_tokenizer, tokenizer, self.renderer_name
         )
-        names = list_trainable_tasks(
-            max_models=self.max_models, destination=self.destination
+        names = select_trainable_tasks(
+            list_trainable_tasks(
+                max_models=self.max_models, destination=self.destination
+            ),
+            task_name=self.task_name,
+            seed=self.seed,
+            max_tasks=self.max_tasks,
         )
-        rng = random.Random(self.seed)
-        rng.shuffle(names)
-        if self.max_tasks:
-            names = names[: self.max_tasks]
         if not names:
             raise ValueError(
                 "No trainable tasks found; check repo/elt-bench and repo/evaluation/gt."
@@ -239,6 +241,7 @@ class CLIConfig:
     kl_reference_model: str | None = None
     max_models: int = 1
     max_tasks: int = 0
+    task_name: str | None = None
     test_frac: float = 0.0
 
     eval_batch_size: int = 0
@@ -281,6 +284,7 @@ async def cli_main(cli_config: CLIConfig) -> None:
         renderer_name=renderer_name,
         max_models=cli_config.max_models,
         max_tasks=cli_config.max_tasks,
+        task_name=cli_config.task_name,
         test_frac=cli_config.test_frac,
         eval_batch_size=cli_config.eval_batch_size,
         seed=cli_config.seed,

@@ -16,29 +16,13 @@ source .venv/bin/activate
 uv pip install -r requirements.txt
 ```
 
-Download the Snowflake ground truth from the upstream Hugging Face dataset with the helper, then run the credential-free tests. Files are stored at `runs/benchmark-assets/evaluation/gt`, which is discovered automatically:
+Download Snowflake ground truth before grading or training. Files are stored at `runs/benchmark-assets/evaluation/gt` and discovered automatically:
 
 ```bash
 bash scripts/fetch_ground_truth.sh
-uv run --active pytest -q
 ```
 
-For local integration tests and training, prepare the local services and benchmark data described in [Setup](docs/setup.md). Set `TINKER_API_KEY` in your shell to run training; do not put credentials in source control.
-
-The setup guide includes scripts to fetch upstream source archives, start local services with the required Compose compatibility settings, and seed source fixtures. This keeps downloaded data and local service configuration out of the ELT-Bench submodule history.
-
-```bash
-uv run --active python tests/manual/rollout_local.py all
-uv run --active python -m eltbench.train --destination local_postgres \
-  --model_name Qwen/Qwen3-8B --batch_size 1 --group_size 4 --max_turns 40
-```
-
-For a credentialed warehouse rollout, configure the selected destination as described in [Setup](docs/setup.md), then run, for example:
-
-```bash
-uv run --active python -m eltbench.train --destination snowflake \
-  --model_name Qwen/Qwen3-8B --check_loading
-```
+Follow [Setup](docs/setup.md) for the credential-free local integration flow and the credentialed Snowflake rollout with a Tinker optimization step.
 
 ## Documentation
 
@@ -52,7 +36,7 @@ eltbench/       Environment, tools, warehouse adapters, rewards, and training CL
 tests/          Unit and integration tests
 scripts/        Environment and benchmark-data helper scripts
 docker/         Agent execution image
-docs/           User-facing setup and design documentation
+docs/           Setup guide
 repo/           Pinned ELT-Bench Git submodule
 ```
 
