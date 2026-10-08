@@ -95,7 +95,13 @@ Do not put API keys or warehouse credentials in `.env` files that might be commi
 
 ## Credentialed warehouse rollouts
 
-The harness supports the official ELT-Bench destinations that have upstream connector support. Set up Airbyte and the selected warehouse using the upstream instructions in [`repo/README.md`](../repo/README.md). Download and seed only the data required for the chosen task when possible. If Airbyte runs in its own local Kubernetes network, connect its control-plane container to the ELT-Bench network created by the helper:
+The harness supports the official ELT-Bench destinations that have upstream connector support. Install Airbyte platform chart version 1.5.0, which is compatible with the ELT-Bench Terraform configuration:
+
+```bash
+abctl local install --chart-version 1.5.0
+```
+
+Keep the Terraform provider at the upstream-pinned version 0.6.5; Airbyte 2.3.0 returns an empty `dataResidency` value that this provider cannot deserialize. Continue with the remaining Airbyte and warehouse setup instructions in [`repo/README.md`](../repo/README.md). Download and seed only the data required for the chosen task when possible. If Airbyte runs in its own local Kubernetes network, connect its control-plane container to the ELT-Bench network created by the helper:
 
 ```bash
 docker network connect elt-docker_elt_network airbyte-abctl-control-plane
