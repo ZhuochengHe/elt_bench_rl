@@ -16,7 +16,7 @@ source .venv/bin/activate
 uv pip install -r requirements.txt
 ```
 
-Download the benchmark ground truth, then run the credential-free tests. Ground truth is stored at `runs/benchmark-assets/evaluation/gt` and discovered automatically:
+Download the Snowflake ground truth from the upstream Hugging Face dataset with the helper, then run the credential-free tests. Files are stored at `runs/benchmark-assets/evaluation/gt`, which is discovered automatically:
 
 ```bash
 bash scripts/fetch_ground_truth.sh

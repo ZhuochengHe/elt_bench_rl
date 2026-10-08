@@ -29,13 +29,13 @@ git submodule update --init --recursive
 
 ## Credential-free checks
 
-The benchmark's ground-truth CSVs are distributed separately from the ELT-Bench Git repository. Download them into the fixed `runs/benchmark-assets/evaluation/gt` location before running tests or training; the application discovers this path automatically:
+The benchmark's ground-truth CSVs are distributed separately from the ELT-Bench Git repository. This project's helper downloads the selected destination's ground-truth files from the [ELT-Bench Hugging Face dataset](https://huggingface.co/datasets/tttjjj/elt_bench) into the fixed `runs/benchmark-assets/evaluation/gt` location, which the application discovers automatically. The default is Snowflake:
 
 ```bash
 bash scripts/fetch_ground_truth.sh
 ```
 
-The script downloads the upstream ELT-Bench ground-truth archive. `gdown` is installed with the project dependencies.
+`huggingface_hub` (including the `hf` CLI) is installed with the project dependencies. The local PostgreSQL backend uses the Snowflake benchmark fixture. For another official destination, pass its name, for example `bash scripts/fetch_ground_truth.sh databricks` or `bash scripts/fetch_ground_truth.sh redshift`. Fetch the variant matching the destination before running its rollout because the grader uses the shared `gt` directory.
 
 Run the unit and isolated integration suite:
 
