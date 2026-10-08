@@ -1,0 +1,21 @@
+# Runtime and test dependencies. Transitive dependencies are managed by
+# tinker-cookbook; direct dependencies are listed here.
+
+tinker-cookbook==0.5.7
+tinker==0.32.0
+
+# Reward and benchmark data
+pandas>=2.2
+numpy>=1.26
+PyYAML>=6.0
+jinja2>=3.1
+
+# Local PostgreSQL backend
+psycopg2-binary>=2.9
+
+# Snowflake backend (not required for local training)
+snowflake-connector-python>=3.5
+
+# Tests
+pytest>=8.0
+pytest-asyncio>=0.24

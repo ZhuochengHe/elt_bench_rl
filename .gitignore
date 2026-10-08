@@ -1,0 +1,53 @@
+# Local credentials and secrets
+.env
+.env.*
+!.env.example
+.secrets/
+tok.txt
+*.token
+*credential*.json
+
+# Generated benchmark inputs and downloaded data
+repo/inputs/
+repo/inputs_*/
+repo/setup/data/
+repo/setup/data_*.zip
+repo/setup/gt.zip
+repo/evaluation/gt/
+repo/evaluation/agent_results/
+repo/elt-docker/rest_api/data/
+docs/ELT-Bench-paper.txt
+notes/
+
+# Local environments and Python artifacts
+.venv/
+venv/
+tools/.venv/
+tools/tinker-venv/
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+
+# Training runs, workspaces, logs, and local state
+runs/
+logs/
+staging/
+*.log
+terraform.tfstate
+terraform.tfstate.*
+.terraform/
+
+# Local infrastructure diagnostics
+scripts/airbyte_probe.sh
+scripts/airbyte_restart.sh
+scripts/airbyte_slim.sh
+scripts/airbyte_token_check.sh
+scripts/env_guard.sh
+scripts/stage1_snowflake_probe.py
+scripts/tinker_probe.py
+
+# Editor and OS files
+.DS_Store
+.idea/
+.vscode/
