@@ -49,6 +49,8 @@ The local end-to-end rollout also requires ELT-Bench source data, local services
 bash scripts/fetch_local_assets.sh
 ```
 
+The extracted files appear as local changes inside the `repo` submodule. Keep them local; do not commit or push from inside `repo`.
+
 Start the services using the upstream Compose file plus the repository-maintained local overlay:
 
 ```bash
