@@ -20,7 +20,7 @@ Download the benchmark ground truth, then run the credential-free tests. Ground 
 
 ```bash
 bash scripts/fetch_ground_truth.sh
-pytest -q
+uv run --active pytest -q
 ```
 
 For local integration tests and training, prepare the local services and benchmark data described in [Setup](docs/setup.md). Set `TINKER_API_KEY` in your shell to run training; do not put credentials in source control.
@@ -28,22 +28,21 @@ For local integration tests and training, prepare the local services and benchma
 The setup guide includes scripts to fetch upstream source archives, start local services with the required Compose compatibility settings, and seed source fixtures. This keeps downloaded data and local service configuration out of the ELT-Bench submodule history.
 
 ```bash
-python tests/manual/rollout_local.py all
-python -m eltbench.train --destination local_postgres \
+uv run --active python tests/manual/rollout_local.py all
+uv run --active python -m eltbench.train --destination local_postgres \
   --model_name Qwen/Qwen3-8B --batch_size 1 --group_size 4 --max_turns 40
 ```
 
 For a credentialed warehouse rollout, configure the selected destination as described in [Setup](docs/setup.md), then run, for example:
 
 ```bash
-python -m eltbench.train --destination snowflake \
+uv run --active python -m eltbench.train --destination snowflake \
   --model_name Qwen/Qwen3-8B --check_loading
 ```
 
 ## Documentation
 
 - [Setup and data preparation](docs/setup.md)
-- [Implementation and reward design](docs/design.md)
 - [ELT-Bench upstream repository](repo/README.md)
 
 ## Repository layout

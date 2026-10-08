@@ -40,7 +40,7 @@ The script downloads the upstream ELT-Bench ground-truth archive. `gdown` is ins
 Run the unit and isolated integration suite:
 
 ```bash
-pytest -q
+uv run --active pytest -q
 ```
 
 The local end-to-end rollout also requires ELT-Bench source data, local services, and the agent image. Download and extract the upstream source-data archives with the project helper. The archives are cached under `runs/benchmark-assets/upstream`; extracted data stays in the submodule's expected local data directories and is not committed:
@@ -63,7 +63,7 @@ The overlay pins LocalStack to a compatible release and applies local container 
 bash scripts/seed_resumable.sh address
 ```
 
-The helper accepts task names as positional arguments. Without arguments it checks all available source definitions. It sets the S3-compatible storage checksum option required by the local seed scripts. For MongoDB-backed sources, use `python scripts/mongo_seed_resumable.py --path repo/setup`. These helpers require Docker, the AWS CLI, and `psql`.
+The helper accepts task names as positional arguments. Without arguments it checks all available source definitions. It sets the S3-compatible storage checksum option required by the local seed scripts. For MongoDB-backed sources, use `uv run --active python scripts/mongo_seed_resumable.py --path repo/setup`. These helpers require Docker, the AWS CLI, and `psql`.
 
 Build the agent image from the project root:
 
@@ -74,10 +74,10 @@ docker build -f docker/Dockerfile.elt-swe -t elt-swe:local .
 Run the full local dbt-to-grader integration probe:
 
 ```bash
-python tests/manual/rollout_local.py all
+uv run --active python tests/manual/rollout_local.py all
 ```
 
-Run `python tests/manual/rollout_local_sources.py` when validating local source materialization. These manual checks require the local database and Docker environment; the regular pytest suite skips external-service checks when prerequisites are unavailable.
+Run `uv run --active python tests/manual/rollout_local_sources.py` when validating local source materialization. These manual checks require the local database and Docker environment; the regular pytest suite skips external-service checks when prerequisites are unavailable.
 
 ## Local RL training
 
@@ -85,7 +85,7 @@ Export the Tinker credential in the shell that runs training:
 
 ```bash
 export TINKER_API_KEY="..."
-python -m eltbench.train \
+uv run --active python -m eltbench.train \
   --destination local_postgres \
   --model_name Qwen/Qwen3-8B \
   --batch_size 1 --group_size 4 --max_turns 40
@@ -123,7 +123,7 @@ The upstream input generator reads Airbyte source credentials from `repo/setup/a
 Example Snowflake rollout:
 
 ```bash
-python -m eltbench.train \
+uv run --active python -m eltbench.train \
   --destination snowflake \
   --model_name Qwen/Qwen3-8B \
   --check_loading \
@@ -136,4 +136,4 @@ Start with a small batch and group size: each concurrent rollout starts a Docker
 
 Local PostgreSQL connection settings can be overridden with `ELT_PG_HOST`, `ELT_PG_PORT`, `ELT_PG_USER`, `ELT_PG_PASSWORD`, `ELT_PG_CONTAINER_HOST`, and `ELT_PG_CONTAINER_PORT`. The default values target the upstream local Compose setup. Ground truth is read from `runs/benchmark-assets/evaluation/gt`. `ELT_BENCH_CREDENTIAL_DIR` optionally points to local warehouse credentials. The `TINKER_API_KEY` is required only for Tinker model calls.
 
-Use `python -m eltbench.train --help` to inspect training options. Keep run output, generated task workspaces, downloaded assets, and credentials outside source control.
+Use `uv run --active python -m eltbench.train --help` to inspect training options. Keep run output, generated task workspaces, downloaded assets, and credentials outside source control.
