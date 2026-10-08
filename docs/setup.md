@@ -4,7 +4,7 @@ This guide prepares the local integration environment and one official Snowflake
 
 ## Install
 
-Requirements: Linux, macOS, or WSL2; Git; [uv](https://docs.astral.sh/uv/); Docker Engine with Compose. The Snowflake flow additionally needs `abctl`, AWS CLI, `psql`, `unzip`, a Snowflake account, and a Tinker API key.
+Requirements: Linux, macOS, or WSL2; Git; [uv](https://docs.astral.sh/uv/); Docker Engine with Compose. The Snowflake flow additionally needs `abctl`, `kubectl`, AWS CLI, `psql`, `unzip`, a Snowflake account, and a Tinker API key.
 
 ```bash
 git clone --recurse-submodules https://github.com/ZhuochengHe/elt_bench_rl.git
@@ -29,13 +29,35 @@ This exercises dbt materialization, warehouse grading, and reward computation wi
 
 ## Snowflake rollout and one Tinker training step
 
-Install the Airbyte platform version used by the upstream Terraform configuration:
+Complete this one-time checklist before a Snowflake rollout:
+
+- [ ] Install Airbyte **1.5.0**. The benchmark Terraform provider is pinned to **0.6.5** in the upstream configuration.
+- [ ] Register the declarative connector image version in Airbyte's database using the command below. The `elt_snowflake.yaml` manifest uses version `6.33.4`, which requires the corresponding major-version `6` row.
+- [ ] Follow the upstream [Airbyte setup instructions](https://github.com/uiuc-kang-lab/ELT-Bench#setup-airbyte): import `repo/setup/elt_snowflake.yaml`, publish it (confirm the warning prompt), and record the Workspace ID and API Definition ID.
+- [ ] Follow the upstream [Snowflake destination setup](https://github.com/uiuc-kang-lab/ELT-Bench#snowflake): replace the sample role, user, warehouse, schema, and password values in `repo/setup/destination/setup.sql`, run it in a Snowflake worksheet, and grant `CREATE DATABASE ON ACCOUNT` to the created role.
+- [ ] Fill in `repo/setup/airbyte/airbyte_credential.json` with Airbyte credentials and the two IDs. Copy `repo/setup/destination/snowflake_credential.json` to `.secrets/destination/snowflake_credential.json` and fill in the matching account, user, password, role, and warehouse values.
+
+Install the pinned Airbyte version:
 
 ```bash
 abctl local install --chart-version 1.5.0
 ```
 
-The upstream Terraform configuration pins provider version `0.6.5`. Fill in Airbyte source credentials in `repo/setup/airbyte/airbyte_credential.json`. Copy `repo/setup/destination/snowflake_credential.json` to `.secrets/destination/snowflake_credential.json` and fill in its required values. Then set the credential locations and Tinker key in your shell:
+Register the declarative connector image version before publishing the source manifest:
+
+```bash
+export KUBECONFIG="$HOME/.airbyte/abctl/abctl.kubeconfig"
+IMAGE_SHA="$(docker buildx imagetools inspect airbyte/source-declarative-manifest:6.33.4 | awk '/Digest:/ {print $2; exit}')"
+kubectl --context kind-airbyte-abctl -n airbyte-abctl exec airbyte-db-0 -- \
+  psql -U airbyte -d db-airbyte -c "INSERT INTO declarative_manifest_image_version \
+  (major_version, image_version, image_sha, created_at, updated_at) \
+  VALUES (6, '6.33.4', '$IMAGE_SHA', now(), now()) \
+  ON CONFLICT (major_version) DO NOTHING;"
+kubectl --context kind-airbyte-abctl -n airbyte-abctl \
+  rollout restart deployment/airbyte-abctl-server
+```
+
+Then set the credential locations and Tinker key in your shell:
 
 ```bash
 mkdir -p .secrets/destination

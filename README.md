@@ -16,13 +16,41 @@ source .venv/bin/activate
 uv pip install -r requirements.txt
 ```
 
-Download Snowflake ground truth before grading or training. Files are stored at `runs/benchmark-assets/evaluation/gt` and discovered automatically:
+Complete the Install section in [Setup](docs/setup.md) first. For the Snowflake command, also complete its Airbyte and Snowflake checklist.
+
+## Acceptance workflows
+
+### Credential-free local integration
+
+This runs the dbt-to-warehouse grader path with a local fixture:
 
 ```bash
-bash scripts/fetch_ground_truth.sh
+bash scripts/fetch_ground_truth.sh local_postgres
+bash scripts/start_local_services.sh
+docker build -f docker/Dockerfile.elt-swe -t elt-swe:local .
+uv run --active python tests/manual/rollout_local.py all
 ```
 
-Follow [Setup](docs/setup.md) for the credential-free local integration flow and the credentialed Snowflake rollout with a Tinker optimization step.
+### Credentialed official rollout and Tinker optimization step
+
+After completing the Snowflake checklist in [Setup](docs/setup.md), this command runs the official `address` task against Snowflake with four rollouts and requests one Tinker optimizer step using execution-derived rewards:
+
+```bash
+bash scripts/fetch_ground_truth.sh snowflake
+bash scripts/fetch_local_assets.sh
+bash scripts/start_local_services.sh
+bash scripts/seed_resumable.sh address
+docker build -f docker/Dockerfile.elt-swe -t elt-swe:local .
+docker network connect elt-docker_elt_network airbyte-abctl-control-plane
+uv run --active python -m eltbench.train \
+  --destination snowflake \
+  --task_name address \
+  --model_name Qwen/Qwen3-8B \
+  --check_loading \
+  --batch_size 1 --group_size 4 --max_steps 1 --max_turns 40
+```
+
+Inspect the run log to confirm the optimizer step completed. If all rollouts have identical rewards, the update may be skipped; use a different task or collect another rollout group.
 
 ## Documentation
 
