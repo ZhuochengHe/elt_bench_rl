@@ -69,7 +69,3 @@ repo/           Pinned ELT-Bench Git submodule
 ```
 
 Local credentials, downloaded benchmark data, generated workspaces, logs, and training runs are intentionally excluded from this repository. See `.gitignore` and [Setup](docs/setup.md).
-
-## Attribution
-
-ELT-Bench is maintained by its upstream authors and is included as a pinned submodule under its own license. Review the upstream license and benchmark dataset terms before redistribution. This repository does not relicense upstream code or benchmark data.
